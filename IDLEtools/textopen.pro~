@@ -1,0 +1,115 @@
+PRO TEXTOPEN,PROGRAM,TEXTOUT=TEXTOUT, STDOUT = STDOUT, MORE_SET = more_set, $
+             SILENT = silent, WIDTH = width
+;+
+; NAME:
+;       TEXTOPEN
+; PURPOSE:
+;       Open a device specified by TEXTOUT with unit !TEXTUNIT 
+; EXPLANATION:
+;       Procedure to open file for text output.   The type of output 
+;       device (disk file or terminal screen) is specified by the 
+;       TEXTOUT keyword or the (nonstandard) system variable !TEXTOUT.
+;
+; CALLING SEQUENCE:
+;       textopen, program, [ TEXTOUT =, /STDOUT, /SILENT, MORE_SET=,
+;       WIDTH= ]
+;
+; INPUTS:
+;       program - scalar string giving name of program calling
+;                 textopen
+;
+; OPTIONAL INPUT KEYWORDS:
+;       TEXTOUT - Integer scalar (0-7) specifying output file/device
+;                 to be 
+;               opened (see below) or scalar string giving name of
+;               output file.
+;               If TEXTOUT is not supplied, then the (non-standard)
+;               system 
+;               variable !TEXTOUT is used.
+;       /SILENT - By default, TEXTOPEN prints an informational message
+;                 when
+;                opening a file for hardcopy output.   Set /SILENT (or
+;                !QUIET)
+;                to suppress this message.
+;       /STDOUT - if this keyword is set and non-zero, then the
+;                 standard output
+;               (unit = -1) is used for TEXTOUT=1 or TEXTOUT=2.   The
+;               use
+;               of STDOUT has  2 possible advantages:
+;               (1) the output will appear in a journal file
+;               (2) Many Unix machines print spurious control
+;               characters when
+;               printing to /dev/tty.   These characters are
+;               eliminated by 
+;               setting /STDOUT
+;
+;               The disadvantage of /STDOUT is that the /MORE option
+;               is not
+;               available.
+;
+;         WIDTH - Specify line width for hardcopy output line wrapping
+;                 (passed onto OPENW).
+;
+; OPTIONAL OUTPUT KEYWORD:
+;       MORE_SET - Returns 1 if the output unit was opened with
+;                  /MORE.   This
+;               occurs if (1) TEXTOUT = 1 and (2) the device is a tty,
+;               and 
+;               (3) /STDOUT is not set.      User can use the returned
+;               value
+;                of MORE_SET to determine whether to end output when
+;                user
+;                presses 'Q'.
+; SIDE EFFECTS:
+;       The following dev/file is opened for output.    Different
+;       effects
+;       occur depending whether the standard output is a GUI
+;       (Macintosh,
+;       Windows, Unix/IDLTool) or a TTY
+;
+;               textout=0       Nowhere
+;               textout=1       if a TTY then TERMINAL using /more
+;               option
+;                                   otherwise standard (Unit=-1)
+;                                   output
+;               textout=2       if a TTY then TERMINAL without /more
+;               option
+;                                   otherwise standard (Unit=-1)
+;                                   output
+;               textout=3       <program>.prt
+;               textout=4       laser.tmp
+;               textout=5      user must open file
+;               textout=7      same as 3 but text is appended to
+;               <program>.prt
+;                               file if it already exists.
+;               textout = filename (default extension of .prt)
+;
+;       The unit to be opened is obtained with the procedure GET_LUN
+;       unless !TEXTOUT=5.  The unit number is placed in system
+;       variable 
+;       !TEXTUNIT.  For !TEXTOUT=5 the user must set !TEXTUNIT to the 
+;       appropriate unit number.
+;
+; NOTES:
+;       When printing to a TTY terminal, the output will *not* appear
+;       in an 
+;       IDL JOURNAL session, unlike text printed with the PRINT
+;       command.
+;
+; NON-STANDARD SYSTEM VARIABLES:
+;       TEXTOPEN will automatically define the following system
+;       variables if
+;       they are not previously defined:
+;
+;       DEFSYSV,'!TEXTOUT',1
+;       DEFSYSV,'!TEXTUNIT',0
+; HISTORY:
+;       D. Lindler  Dec. 1986  
+;       Keyword textout added, J. Isensee, July, 1990
+;       Made transportable, D. Neill, April, 1991
+;       Trim input PROGRAM string W. Landsman  Feb 1993
+;       Don't modify TEXTOUT value   W. Landsman   Aug 1993
+;       Modified for MacOS  I. Freedman April 1994
+;       Modified for output terminals without a TTY  W. Landsman
+;       August 1995
+;       Added /STDOUT keyword   W. Landsman    A
